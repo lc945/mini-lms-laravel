@@ -37,7 +37,7 @@
                         class="flex items-center gap-2 bg-purple-600 text-white px-4 py-1.5 rounded-lg hover:bg-purple-700 transition text-sm font-semibold">
                     🤖 Générer avec l'IA
                 </button>
-                <span id="ia-loading" class="hidden text-purple-600 text-sm animate-pulse">Génération en cours...</span>
+                <span id="ia-loading" class="hidden text-purple-600 text-sm animate-pulse">⏳ Génération en cours (peut prendre 30s)...</span>
             </div>
             <textarea name="contenu" id="contenu" rows="10"
                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 font-mono text-sm">{{ old('contenu', $sousChapitre->contenu) }}</textarea>

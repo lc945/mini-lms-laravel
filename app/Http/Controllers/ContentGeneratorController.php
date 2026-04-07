@@ -28,7 +28,7 @@ class ContentGeneratorController extends Controller
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
-        ])->timeout(30)->post('https://api.openai.com/v1/chat/completions', [
+        ])->timeout(60)->post('https://api.openai.com/v1/chat/completions', [
             'model' => 'gpt-3.5-turbo',
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
