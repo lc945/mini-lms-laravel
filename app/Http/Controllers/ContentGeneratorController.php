@@ -14,7 +14,7 @@ class ContentGeneratorController extends Controller
             'formation' => 'nullable|string|max:255',
         ]);
 
-        $apiKey = config('services.openai.key');
+        $apiKey = config('services.groq.key');
         if (!$apiKey) {
             return response()->json(['error' => 'Clé API non configurée.'], 500);
         }
@@ -28,8 +28,8 @@ class ContentGeneratorController extends Controller
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
-        ])->timeout(60)->post('https://api.openai.com/v1/chat/completions', [
-            'model' => 'gpt-3.5-turbo',
+        ])->timeout(30)->post('https://api.groq.com/openai/v1/chat/completions', [
+            'model' => 'llama3-8b-8192',
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],
