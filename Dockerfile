@@ -13,6 +13,8 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
+RUN touch database/database.sqlite
+
 EXPOSE 8000
 
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+CMD php artisan migrate:fresh --seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
