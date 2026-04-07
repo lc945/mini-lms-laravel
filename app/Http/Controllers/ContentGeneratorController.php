@@ -29,14 +29,14 @@ class ContentGeneratorController extends Controller
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
         ])->timeout(30)->post('https://api.groq.com/openai/v1/chat/completions', [
-            'model' => 'llama3-8b-8192',
+            'model' => 'llama-3.1-8b-instant',
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],
         ]);
 
         if ($response->failed()) {
-            return response()->json(['error' => 'Erreur API : ' . $response->status()], 500);
+            return response()->json(['error' => 'Erreur API ' . $response->status() . ' : ' . $response->body()], 500);
         }
 
         $content = $response->json('choices.0.message.content');
