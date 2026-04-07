@@ -95,12 +95,16 @@ function genererContenu() {
         },
         body: JSON.stringify({ titre, formation }),
     })
-    .then(r => r.json())
-    .then(data => {
-        if (data.error) { alert('Erreur : ' + data.error); return; }
-        document.getElementById('contenu').value = data.content;
-    })
-    .catch(() => alert('Erreur de connexion à l\'API.'))
+    .then(r => r.text().then(text => {
+        try {
+            const data = JSON.parse(text);
+            if (data.error) { alert('Erreur API : ' + data.error); return; }
+            document.getElementById('contenu').value = data.content;
+        } catch(e) {
+            alert('Erreur serveur (code ' + r.status + '). Vérifiez que la clé OPENAI_API_KEY est configurée sur Render.');
+        }
+    }))
+    .catch(e => alert('Erreur réseau : ' + e.message))
     .finally(() => {
         document.getElementById('btn-generate').disabled = false;
         document.getElementById('ia-loading').classList.add('hidden');
