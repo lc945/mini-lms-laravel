@@ -28,8 +28,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'anthropic' => [
-        'key' => env('ANTHROPIC_API_KEY'),
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
     ],
 
     'slack' => [

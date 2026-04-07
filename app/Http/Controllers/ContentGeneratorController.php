@@ -14,7 +14,7 @@ class ContentGeneratorController extends Controller
             'formation' => 'nullable|string|max:255',
         ]);
 
-        $apiKey = config('services.anthropic.key');
+        $apiKey = config('services.openai.key');
         if (!$apiKey) {
             return response()->json(['error' => 'Clé API non configurée.'], 500);
         }
@@ -26,12 +26,10 @@ class ContentGeneratorController extends Controller
         $prompt .= ".\n\nLe contenu doit :\n- Être informatif et pédagogique\n- Faire entre 150 et 300 mots\n- Utiliser des listes à puces si pertinent\n- Être directement utilisable comme contenu de cours\n\nRéponds uniquement avec le contenu du cours, sans titre ni introduction.";
 
         $response = Http::withHeaders([
-            'x-api-key' => $apiKey,
-            'anthropic-version' => '2023-06-01',
-            'content-type' => 'application/json',
-        ])->timeout(30)->post('https://api.anthropic.com/v1/messages', [
-            'model' => 'claude-haiku-4-5-20251001',
-            'max_tokens' => 1024,
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type' => 'application/json',
+        ])->timeout(30)->post('https://api.openai.com/v1/chat/completions', [
+            'model' => 'gpt-3.5-turbo',
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],
@@ -41,7 +39,7 @@ class ContentGeneratorController extends Controller
             return response()->json(['error' => 'Erreur API : ' . $response->status()], 500);
         }
 
-        $content = $response->json('content.0.text');
+        $content = $response->json('choices.0.message.content');
 
         return response()->json(['content' => $content]);
     }
