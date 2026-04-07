@@ -30,8 +30,16 @@
 
         <div class="mb-4">
             <label class="block text-gray-700 font-semibold mb-2">Contenu pédagogique</label>
-            <p class="text-xs text-gray-500 mb-2">Vous pouvez coller ici un texte généré par IA (ChatGPT, etc.)</p>
-            <textarea name="contenu" rows="10"
+            <div class="flex items-center gap-3 mb-2">
+                <p class="text-xs text-gray-500">Saisissez manuellement ou régénérez avec l'IA.</p>
+                <button type="button" id="btn-generate"
+                        onclick="genererContenu()"
+                        class="flex items-center gap-2 bg-purple-600 text-white px-4 py-1.5 rounded-lg hover:bg-purple-700 transition text-sm font-semibold">
+                    🤖 Générer avec l'IA
+                </button>
+                <span id="ia-loading" class="hidden text-purple-600 text-sm animate-pulse">Génération en cours...</span>
+            </div>
+            <textarea name="contenu" id="contenu" rows="10"
                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 font-mono text-sm">{{ old('contenu', $sousChapitre->contenu) }}</textarea>
             @error('contenu') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
@@ -62,4 +70,38 @@
     </form>
 </div>
 
+<script>
+function genererContenu() {
+    const titre = document.querySelector('input[name="titre"]').value;
+    const chapitreSelect = document.querySelector('select[name="chapitre_id"]');
+    const formation = chapitreSelect.options[chapitreSelect.selectedIndex]?.text?.split('›')[0]?.trim() || '';
+
+    if (!titre) {
+        alert('Veuillez d\'abord saisir le titre du sous-chapitre.');
+        return;
+    }
+
+    document.getElementById('btn-generate').disabled = true;
+    document.getElementById('ia-loading').classList.remove('hidden');
+
+    fetch('{{ route("admin.generate.content") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        },
+        body: JSON.stringify({ titre, formation }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert('Erreur : ' + data.error); return; }
+        document.getElementById('contenu').value = data.content;
+    })
+    .catch(() => alert('Erreur de connexion à l\'API.'))
+    .finally(() => {
+        document.getElementById('btn-generate').disabled = false;
+        document.getElementById('ia-loading').classList.add('hidden');
+    });
+}
+</script>
 @endsection

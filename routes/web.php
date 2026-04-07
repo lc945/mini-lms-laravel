@@ -24,6 +24,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Gestion des questions dans un quiz
     Route::post('quiz/{quiz}/questions', [\App\Http\Controllers\QuestionController::class, 'store'])->name('questions.store');
     Route::delete('questions/{question}', [\App\Http\Controllers\QuestionController::class, 'destroy'])->name('questions.destroy');
+
+    // Génération de contenu par IA
+    Route::post('generate-content', [\App\Http\Controllers\ContentGeneratorController::class, 'generate'])->name('generate.content');
 });
 
 // Routes apprenant
