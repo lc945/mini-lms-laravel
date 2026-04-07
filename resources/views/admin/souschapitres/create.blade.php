@@ -84,7 +84,7 @@ function genererContenu() {
     document.getElementById('btn-generate').disabled = true;
     document.getElementById('ia-loading').classList.remove('hidden');
 
-    fetch('{{ route("admin.generate.content") }}', {
+    fetch('/admin/generate-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
         body: JSON.stringify({ titre, formation }),
