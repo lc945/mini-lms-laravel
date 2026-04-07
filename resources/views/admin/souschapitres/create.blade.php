@@ -36,7 +36,6 @@
                 <p class="text-xs text-gray-500">Saisissez manuellement ou générez avec l'IA.</p>
                 <button type="button" id="btn-generate"
                         onclick="genererContenu()"
-                        data-apikey="{{ config('services.openai.key') }}"
                         class="flex items-center gap-2 bg-purple-600 text-white px-4 py-1.5 rounded-lg hover:bg-purple-700 transition text-sm font-semibold">
                     🤖 Générer avec l'IA
                 </button>
@@ -79,32 +78,26 @@ function genererContenu() {
     const titre = document.querySelector('input[name="titre"]').value;
     const chapitreSelect = document.querySelector('select[name="chapitre_id"]');
     const formation = chapitreSelect.options[chapitreSelect.selectedIndex]?.text?.split('›')[0]?.trim() || '';
-    const apiKey = document.getElementById('btn-generate').dataset.apikey;
 
     if (!titre) { alert('Veuillez d\'abord saisir le titre du sous-chapitre.'); return; }
-    if (!apiKey) { alert('Clé API non configurée sur le serveur.'); return; }
 
     document.getElementById('btn-generate').disabled = true;
     document.getElementById('ia-loading').classList.remove('hidden');
 
-    const prompt = `Tu es un expert pédagogique. Génère un contenu de cours structuré en français pour un sous-chapitre intitulé "${titre}"${formation ? ` dans la formation "${formation}"` : ''}. Le contenu doit faire 150-300 mots, utiliser des listes si pertinent. Réponds uniquement avec le contenu, sans titre.`;
-
-    fetch('https://api.openai.com/v1/chat/completions', {
+    fetch('{{ route("admin.generate.content") }}', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey,
-        },
-        body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
-            messages: [{ role: 'user', content: prompt }],
-        }),
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        body: JSON.stringify({ titre, formation }),
     })
-    .then(r => r.json())
-    .then(data => {
-        if (data.error) { alert('Erreur OpenAI : ' + data.error.message); return; }
-        document.getElementById('contenu').value = data.choices[0].message.content;
-    })
+    .then(r => r.text().then(text => {
+        try {
+            const data = JSON.parse(text);
+            if (data.error) { alert('Erreur : ' + data.error); return; }
+            document.getElementById('contenu').value = data.content;
+        } catch(e) {
+            alert('Erreur serveur (' + r.status + '). Vérifiez la clé OPENAI_API_KEY sur Render.');
+        }
+    }))
     .catch(e => alert('Erreur : ' + e.message))
     .finally(() => {
         document.getElementById('btn-generate').disabled = false;
