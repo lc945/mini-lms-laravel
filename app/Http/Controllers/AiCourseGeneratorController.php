@@ -37,7 +37,7 @@ class AiCourseGeneratorController extends Controller
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
         ])->timeout(120)->post('https://api.groq.com/openai/v1/chat/completions', [
-            'model' => 'gemma2-9b-it',
+            'model' => 'llama3-70b-8192',
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $request->prompt],
@@ -46,7 +46,8 @@ class AiCourseGeneratorController extends Controller
         ]);
 
         if ($response->failed()) {
-            return back()->with('error', 'Erreur API Groq : ' . $response->status());
+            $errorMsg = $response->json('error.message') ?? $response->body();
+            return back()->with('error', 'Erreur API Groq ' . $response->status() . ' : ' . $errorMsg);
         }
 
         $text = $response->json('choices.0.message.content');
