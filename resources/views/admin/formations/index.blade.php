@@ -4,10 +4,16 @@
 
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-800">📚 Formations</h1>
-    <a href="{{ route('admin.formations.create') }}" 
-       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-        + Nouvelle formation
-    </a>
+    <div class="flex gap-3">
+        <a href="{{ route('admin.ai.generate') }}"
+           class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition font-semibold">
+            🤖 Générer avec l'IA
+        </a>
+        <a href="{{ route('admin.formations.create') }}"
+           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            + Nouvelle formation
+        </a>
+    </div>
 </div>
 
 <div class="grid gap-4">

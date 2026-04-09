@@ -17,6 +17,7 @@
         @auth
             <span class="text-sm opacity-75">{{ auth()->user()->name }}</span>
             @if(auth()->user()->role === 'admin')
+                <a href="{{ route('admin.ai.generate') }}" class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded text-sm font-semibold transition">🤖 Générer avec l'IA</a>
                 <a href="{{ route('admin.formations.index') }}" class="hover:underline text-sm">📚 Formations</a>
                 <a href="{{ route('admin.chapitres.index') }}" class="hover:underline text-sm">📖 Chapitres</a>
                 <a href="{{ route('admin.quiz.index') }}" class="hover:underline text-sm">📝 Quiz</a>

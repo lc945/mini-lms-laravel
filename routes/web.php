@@ -25,8 +25,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('quiz/{quiz}/questions', [\App\Http\Controllers\QuestionController::class, 'store'])->name('questions.store');
     Route::delete('questions/{question}', [\App\Http\Controllers\QuestionController::class, 'destroy'])->name('questions.destroy');
 
-    // Génération de contenu par IA
+    // Génération de contenu par IA (sous-chapitre)
     Route::post('generate-content', [\App\Http\Controllers\ContentGeneratorController::class, 'generate'])->name('generate.content');
+
+    // Génération de cours complet par IA
+    Route::get('ai/generate', [\App\Http\Controllers\AiCourseGeneratorController::class, 'index'])->name('ai.generate');
+    Route::post('ai/generate', [\App\Http\Controllers\AiCourseGeneratorController::class, 'generate'])->name('ai.generate');
 });
 
 // Routes apprenant
