@@ -5,36 +5,35 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     if (auth()->check()) {
         return auth()->user()->role === 'admin'
-            ? redirect()->route('admin.formations.index')
-            : redirect()->route('apprenants.formations');
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('apprenants.dashboard');
     }
     return redirect()->route('login');
 });
 
 // Routes admin
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'admin'])->name('dashboard');
+
     Route::resource('formations', \App\Http\Controllers\FormationController::class);
     Route::resource('chapitres', \App\Http\Controllers\ChapitreController::class);
     Route::resource('sous-chapitres', \App\Http\Controllers\SousChapitreController::class);
     Route::resource('quiz', \App\Http\Controllers\QuizController::class);
     Route::resource('notes', \App\Http\Controllers\NoteController::class);
-
     Route::resource('apprenants', \App\Http\Controllers\AdminApprenantController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
 
-    // Gestion des questions dans un quiz
     Route::post('quiz/{quiz}/questions', [\App\Http\Controllers\QuestionController::class, 'store'])->name('questions.store');
     Route::delete('questions/{question}', [\App\Http\Controllers\QuestionController::class, 'destroy'])->name('questions.destroy');
 
-    // Génération de contenu par IA (sous-chapitre)
     Route::post('generate-content', [\App\Http\Controllers\ContentGeneratorController::class, 'generate'])->name('generate.content');
 
-    // Génération de cours complet par IA
     Route::get('ai/generate', [\App\Http\Controllers\AiCourseGeneratorController::class, 'index'])->name('ai.generate');
     Route::post('ai/generate', [\App\Http\Controllers\AiCourseGeneratorController::class, 'generate'])->name('ai.generate');
 });
 
 // Routes apprenant
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'apprenant'])->name('apprenants.dashboard');
     Route::get('/mes-formations', [\App\Http\Controllers\ApprenantController::class, 'index'])->name('apprenants.formations');
     Route::get('/mes-formations/{formation}', [\App\Http\Controllers\ApprenantController::class, 'show'])->name('apprenants.formations.show');
     Route::get('/sous-chapitre/{sousChapitre}', [\App\Http\Controllers\ApprenantController::class, 'showSousChapitre'])->name('apprenants.souschapitres.show');

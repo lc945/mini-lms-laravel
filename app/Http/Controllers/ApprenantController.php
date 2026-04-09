@@ -24,9 +24,24 @@ class ApprenantController extends Controller
 
     public function showSousChapitre(SousChapitre $sousChapitre)
     {
-        $quiz = $sousChapitre->quiz;
         $chapitre = $sousChapitre->chapitre;
         $formation = $chapitre->formation;
-        return view('apprenants.souschapitres.show', compact('sousChapitre', 'quiz', 'chapitre', 'formation'));
+        $quiz = $sousChapitre->quiz;
+
+        // Construire la liste ordonnée de tous les sous-chapitres de la formation
+        $tous = collect();
+        foreach ($formation->chapitres()->orderBy('ordre')->get() as $ch) {
+            foreach ($ch->souschapitres()->orderBy('ordre')->get() as $sc) {
+                $tous->push($sc);
+            }
+        }
+
+        $index = $tous->search(fn($sc) => $sc->id === $sousChapitre->id);
+        $precedent = $index > 0 ? $tous[$index - 1] : null;
+        $suivant = $index < $tous->count() - 1 ? $tous[$index + 1] : null;
+
+        return view('apprenants.souschapitres.show', compact(
+            'sousChapitre', 'quiz', 'chapitre', 'formation', 'precedent', 'suivant'
+        ));
     }
 }

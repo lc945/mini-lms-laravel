@@ -9,34 +9,36 @@
 <body class="bg-gray-100 min-h-screen">
 
 <!-- Navigation -->
-<nav class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center shadow-lg">
-    <a href="/" class="font-bold text-xl flex items-center gap-2">
-        🎓 Mini LMS
-    </a>
-    <div class="flex gap-4 items-center">
-        @auth
-            <span class="text-sm opacity-75">{{ auth()->user()->name }}</span>
-            @if(auth()->user()->role === 'admin')
-                <a href="{{ route('admin.ai.generate') }}" class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded text-sm font-semibold transition">🤖 Générer avec l'IA</a>
-                <a href="{{ route('admin.formations.index') }}" class="hover:underline text-sm">📚 Formations</a>
-                <a href="{{ route('admin.chapitres.index') }}" class="hover:underline text-sm">📖 Chapitres</a>
-                <a href="{{ route('admin.quiz.index') }}" class="hover:underline text-sm">📝 Quiz</a>
-                <a href="{{ route('admin.apprenants.index') }}" class="hover:underline text-sm">👥 Apprenants</a>
-                <a href="{{ route('admin.notes.index') }}" class="hover:underline text-sm">📊 Notes</a>
-            @else
-                <a href="{{ route('apprenants.formations') }}" class="hover:underline text-sm">📚 Mes formations</a>
-                <a href="{{ route('notes.mes-notes') }}" class="hover:underline text-sm">📊 Mes notes</a>
-            @endif
-            <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <button class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition text-sm">Déconnexion</button>
-            </form>
-        @endauth
+<nav class="bg-blue-700 text-white px-6 py-3 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <a href="/" class="font-bold text-xl flex items-center gap-2">
+            🎓 Mini LMS
+        </a>
+        <div class="flex gap-3 items-center flex-wrap">
+            @auth
+                <span class="text-sm opacity-75 hidden md:inline">{{ auth()->user()->name }}</span>
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.dashboard') }}" class="hover:underline text-sm">🏠 Dashboard</a>
+                    <a href="{{ route('admin.ai.generate') }}" class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded-lg text-sm font-semibold transition">🤖 IA</a>
+                    <a href="{{ route('admin.formations.index') }}" class="hover:underline text-sm">📚 Formations</a>
+                    <a href="{{ route('admin.apprenants.index') }}" class="hover:underline text-sm">👥 Apprenants</a>
+                    <a href="{{ route('admin.notes.index') }}" class="hover:underline text-sm">📊 Notes</a>
+                @else
+                    <a href="{{ route('apprenants.dashboard') }}" class="hover:underline text-sm">🏠 Dashboard</a>
+                    <a href="{{ route('apprenants.formations') }}" class="hover:underline text-sm">📚 Mes formations</a>
+                    <a href="{{ route('notes.mes-notes') }}" class="hover:underline text-sm">📊 Mes notes</a>
+                @endif
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition text-sm">Déconnexion</button>
+                </form>
+            @endauth
+        </div>
     </div>
 </nav>
 
 <!-- Contenu principal -->
-<div class="max-w-6xl mx-auto mt-8 px-4 pb-8">
+<div class="max-w-7xl mx-auto mt-6 px-4 pb-8">
     @if(session('success'))
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded mb-4 flex items-center gap-2">
             ✅ {{ session('success') }}
