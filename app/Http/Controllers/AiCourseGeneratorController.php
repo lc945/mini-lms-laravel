@@ -53,15 +53,20 @@ class AiCourseGeneratorController extends Controller
 
         $text = $response->json('choices.0.message.content');
 
-        // Extraire le JSON même si l'IA ajoute du texte autour
+        // Nettoyer les blocs markdown éventuels
+        $text = preg_replace('/```json\s*/i', '', $text);
+        $text = preg_replace('/```\s*/i', '', $text);
+        $text = trim($text);
+
+        // Extraire le JSON
         preg_match('/\{.*\}/s', $text, $matches);
         if (empty($matches)) {
-            return back()->with('error', 'L\'IA n\'a pas retourné un JSON valide. Réessayez.');
+            return back()->with('error', 'L\'IA n\'a pas retourné un JSON valide. Réessayez dans 1 minute.');
         }
 
         $data = json_decode($matches[0], true);
         if (!$data || !isset($data['formation'], $data['chapitres'])) {
-            return back()->with('error', 'Structure JSON invalide. Réessayez.');
+            return back()->with('error', 'Structure JSON invalide. Réponse reçue : ' . substr($matches[0], 0, 200));
         }
 
         // Créer la formation
