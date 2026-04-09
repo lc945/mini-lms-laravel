@@ -31,20 +31,29 @@ class AiCourseGeneratorController extends Controller
             return back()->with('error', 'Clé API Groq non configurée.');
         }
 
-        $systemPrompt = 'JSON uniquement, sans markdown. Tout le contenu doit être rédigé en français. Schéma : {"formation":{"nom":"","description":"","niveau":"' . $request->niveau . '","duree":3},"chapitres":[{"titre":"","description":"","sous_chapitres":[{"titre":"","contenu":"contenu pédagogique détaillé de 200 mots minimum avec exemples concrets et explications approfondies"}],"quiz":{"titre":"","questions":[{"question":"","reponses":["A","B","C"],"bonne_reponse":0}]}}]}. Génère ' . $request->nb_chapitres . ' chapitres, 1 sous-chapitre chacun, 3 questions de quiz. Rédige un contenu riche et pédagogique en français.';
+        $systemPrompt = 'JSON uniquement, sans markdown. Tout en français. Schéma : {"formation":{"nom":"","description":"","niveau":"' . $request->niveau . '","duree":3},"chapitres":[{"titre":"","description":"","sous_chapitres":[{"titre":"","contenu":"120 mots max, structuré avec exemples"}],"quiz":{"titre":"","questions":[{"question":"","reponses":["A","B","C"],"bonne_reponse":0}]}}]}. Génère ' . $request->nb_chapitres . ' chapitres, 1 sous-chapitre chacun, 2 questions de quiz.';
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-            'Content-Type' => 'application/json',
-        ])->timeout(120)->post('https://api.groq.com/openai/v1/chat/completions', [
+        $payload = [
             'model' => 'llama-3.3-70b-versatile',
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $request->prompt],
             ],
-            'max_tokens' => 3000,
+            'max_tokens' => 2000,
             'temperature' => 0.7,
-        ]);
+        ];
+
+        // Retry automatique si 429
+        $response = null;
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ])->timeout(120)->post('https://api.groq.com/openai/v1/chat/completions', $payload);
+
+            if ($response->status() !== 429) break;
+            sleep(20);
+        }
 
         if ($response->failed()) {
             $errorMsg = $response->json('error.message') ?? $response->body();
