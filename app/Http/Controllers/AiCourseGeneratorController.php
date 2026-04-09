@@ -31,7 +31,7 @@ class AiCourseGeneratorController extends Controller
             return back()->with('error', 'Clé API Groq non configurée.');
         }
 
-        $systemPrompt = 'Réponds UNIQUEMENT avec un JSON valide, sans markdown ni texte. Structure : {"formation":{"nom":"...","description":"...","niveau":"' . $request->niveau . '","duree":3},"chapitres":[{"titre":"...","description":"...","sous_chapitres":[{"titre":"...","contenu":"..."}],"quiz":{"titre":"...","questions":[{"question":"...","reponses":["A","B","C"],"bonne_reponse":0}]}}]}. Génère ' . $request->nb_chapitres . ' chapitres, 2 sous-chapitres par chapitre (contenu 100 mots), 3 questions par quiz.';
+        $systemPrompt = 'JSON only, no markdown. Schema: {"formation":{"nom":"","description":"","niveau":"' . $request->niveau . '","duree":3},"chapitres":[{"titre":"","description":"","sous_chapitres":[{"titre":"","contenu":"50 words max"}],"quiz":{"titre":"","questions":[{"question":"","reponses":["A","B","C"],"bonne_reponse":0}]}}]}. Generate ' . $request->nb_chapitres . ' chapitres, 1 sous_chapitre each, 2 quiz questions. Be concise.';
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
@@ -42,6 +42,7 @@ class AiCourseGeneratorController extends Controller
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $request->prompt],
             ],
+            'max_tokens' => 1500,
             'temperature' => 0.7,
         ]);
 

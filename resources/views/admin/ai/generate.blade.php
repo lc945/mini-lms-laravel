@@ -29,8 +29,8 @@
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Nombre de chapitres *</label>
                 <select name="nb_chapitres" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
-                    @foreach([1,2,3,4,5] as $n)
-                        <option value="{{ $n }}" @selected(old('nb_chapitres', 3) == $n)>{{ $n }} chapitre{{ $n > 1 ? 's' : '' }}</option>
+                    @foreach([1,2,3] as $n)
+                        <option value="{{ $n }}" @selected(old('nb_chapitres', 2) == $n)>{{ $n }} chapitre{{ $n > 1 ? 's' : '' }}</option>
                     @endforeach
                 </select>
             </div>
