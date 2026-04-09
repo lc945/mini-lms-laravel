@@ -31,47 +31,13 @@ class AiCourseGeneratorController extends Controller
             return back()->with('error', 'Clé API Groq non configurée.');
         }
 
-        $systemPrompt = <<<PROMPT
-Tu es un expert en ingénierie pédagogique. L'utilisateur va te donner une consigne pour créer un cours complet.
-Tu dois retourner UNIQUEMENT un objet JSON valide (sans markdown, sans explication, sans texte avant ou après) avec cette structure exacte :
-{
-  "formation": {
-    "nom": "Titre de la formation",
-    "description": "Description courte de la formation",
-    "niveau": "{$request->niveau}",
-    "duree": 3
-  },
-  "chapitres": [
-    {
-      "titre": "Titre du chapitre",
-      "description": "Description du chapitre",
-      "sous_chapitres": [
-        {
-          "titre": "Titre du sous-chapitre",
-          "contenu": "Contenu pédagogique complet (200-300 mots minimum)"
-        }
-      ],
-      "quiz": {
-        "titre": "Quiz — Titre du chapitre",
-        "questions": [
-          {
-            "question": "Question ?",
-            "reponses": ["Réponse A", "Réponse B", "Réponse C"],
-            "bonne_reponse": 0
-          }
-        ]
-      }
-    }
-  ]
-}
-Génère exactement {$request->nb_chapitres} chapitres. Chaque chapitre doit avoir 2 sous-chapitres et un quiz de 3 questions. Réponds uniquement avec le JSON, rien d'autre.
-PROMPT;
+        $systemPrompt = 'Réponds UNIQUEMENT avec un JSON valide, sans markdown ni texte. Structure : {"formation":{"nom":"...","description":"...","niveau":"' . $request->niveau . '","duree":3},"chapitres":[{"titre":"...","description":"...","sous_chapitres":[{"titre":"...","contenu":"..."}],"quiz":{"titre":"...","questions":[{"question":"...","reponses":["A","B","C"],"bonne_reponse":0}]}}]}. Génère ' . $request->nb_chapitres . ' chapitres, 2 sous-chapitres par chapitre (contenu 100 mots), 3 questions par quiz.';
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
         ])->timeout(120)->post('https://api.groq.com/openai/v1/chat/completions', [
-            'model' => 'llama-3.1-8b-instant',
+            'model' => 'gemma2-9b-it',
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $request->prompt],
