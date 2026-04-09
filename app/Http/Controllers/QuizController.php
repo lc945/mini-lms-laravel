@@ -79,7 +79,19 @@ class QuizController extends Controller
         }
 
         $pourcentage = $total > 0 ? round(($score / $total) * 100) : 0;
+        $noteSur20 = $total > 0 ? round(($score / $total) * 20, 2) : 0;
 
-        return view('apprenants.quiz.resultat', compact('score', 'total', 'pourcentage', 'quiz'));
+        // Récupérer le nom de la formation pour la matière
+        $formation = $quiz->sousChapitre?->chapitre?->formation;
+        $matiere = $formation ? $formation->nom . ' — ' . $quiz->titre : $quiz->titre;
+
+        // Sauvegarder la note automatiquement
+        \App\Models\Note::create([
+            'user_id' => auth()->id(),
+            'matiere' => $matiere,
+            'note' => $noteSur20,
+        ]);
+
+        return view('apprenants.quiz.resultat', compact('score', 'total', 'pourcentage', 'quiz', 'noteSur20'));
     }
 }

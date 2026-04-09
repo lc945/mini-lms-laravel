@@ -22,9 +22,10 @@
             </div>
         </div>
 
-        <p class="text-gray-600 text-lg mb-2">
+        <p class="text-gray-600 text-lg mb-1">
             <strong>{{ $score }}</strong> bonne(s) réponse(s) sur <strong>{{ $total }}</strong>
         </p>
+        <p class="text-gray-500 text-sm">Note enregistrée : <strong class="text-gray-700">{{ $noteSur20 }}/20</strong></p>
 
         @if($pourcentage >= 70)
         <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 mt-4">

@@ -63,7 +63,14 @@ class NoteController extends Controller
 
     public function mesNotes()
     {
-        $notes = auth()->user()->notes;
-        return view('apprenants.notes.index', compact('notes'));
+        $notes = auth()->user()->notes()->latest()->get();
+        $notesByFormation = $notes->groupBy(function($note) {
+            // Extraire le nom de la formation (avant " — ")
+            return strpos($note->matiere, ' — ') !== false
+                ? explode(' — ', $note->matiere)[0]
+                : 'Autres';
+        });
+        $moyenne = $notes->avg('note');
+        return view('apprenants.notes.index', compact('notes', 'notesByFormation', 'moyenne'));
     }
 }
