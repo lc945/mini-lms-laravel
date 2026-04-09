@@ -7,56 +7,48 @@
     <p class="text-gray-500 mt-1">Bienvenue dans votre espace d'apprentissage.</p>
 </div>
 
-@if($formation)
-<!-- Formation en cours -->
-<div class="bg-white rounded-xl shadow p-6 mb-6">
-    <div class="flex justify-between items-start mb-4">
-        <div>
-            <h2 class="text-lg font-bold text-gray-800">📚 Ma formation</h2>
-            <p class="text-blue-600 font-semibold mt-1">{{ $formation->nom }}</p>
-            <p class="text-sm text-gray-500">Niveau : {{ $formation->niveau }}</p>
-        </div>
-        <a href="{{ route('apprenants.formations.show', $formation) }}"
-           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-semibold">
-            Accéder au cours →
-        </a>
-    </div>
-
-    @php
-        $totalSc = 0;
-        foreach($formation->chapitres as $ch) $totalSc += $ch->souschapitres->count();
-    @endphp
-    <div class="flex items-center gap-3">
-        <div class="flex-1 bg-gray-200 rounded-full h-3">
-            <div class="bg-blue-600 h-3 rounded-full" style="width: 25%"></div>
-        </div>
-        <span class="text-sm text-gray-500 whitespace-nowrap">{{ $formation->chapitres->count() }} chapitre(s) · {{ $totalSc }} sous-chapitre(s)</span>
-    </div>
-</div>
-
 @if($dernierSousChapitre)
 <!-- Reprendre -->
 <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6 flex items-center justify-between">
     <div class="flex items-center gap-4">
         <span class="text-3xl">▶️</span>
         <div>
-            <p class="font-bold text-blue-800">Continuer l'apprentissage</p>
+            <p class="font-bold text-blue-800">Commencer l'apprentissage</p>
             <p class="text-sm text-blue-600">{{ $dernierSousChapitre->titre }}</p>
         </div>
     </div>
     <a href="{{ route('apprenants.souschapitres.show', $dernierSousChapitre) }}"
        class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition font-semibold text-sm">
-        Reprendre →
+        Démarrer →
     </a>
 </div>
 @endif
 
-@else
-<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-6 text-center">
-    <p class="text-yellow-800 font-semibold">Aucune formation assignée pour le moment.</p>
-    <p class="text-yellow-600 text-sm mt-1">Contactez votre formateur pour être inscrit à une formation.</p>
+<!-- Formations disponibles -->
+<div class="mb-6">
+    <h2 class="text-lg font-bold text-gray-700 mb-3">📚 Formations disponibles</h2>
+    @forelse($formations as $formation)
+    <div class="bg-white rounded-xl shadow p-5 mb-3 flex justify-between items-center hover:shadow-md transition">
+        <div>
+            <p class="font-bold text-gray-800">{{ $formation->nom }}</p>
+            <p class="text-sm text-gray-500 mt-0.5">
+                Niveau : <span class="font-medium">{{ $formation->niveau }}</span>
+                · {{ $formation->chapitres_count }} chapitre(s)
+                @if($formation->duree) · ⏱ {{ $formation->duree }}h @endif
+            </p>
+        </div>
+        <a href="{{ route('apprenants.formations.show', $formation) }}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-semibold whitespace-nowrap ml-4">
+            Accéder →
+        </a>
+    </div>
+    @empty
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+        <p class="text-yellow-800 font-semibold">Aucune formation disponible pour le moment.</p>
+        <p class="text-yellow-600 text-sm mt-1">Revenez bientôt !</p>
+    </div>
+    @endforelse
 </div>
-@endif
 
 <!-- Mes notes -->
 <div class="bg-white rounded-xl shadow p-6">
@@ -80,9 +72,7 @@
     @endif
     @forelse($notes as $note)
     <div class="flex justify-between items-center py-3 border-b last:border-0">
-        <div>
-            <p class="font-semibold text-gray-800 text-sm">{{ $note->matiere }}</p>
-        </div>
+        <p class="font-semibold text-gray-800 text-sm">{{ $note->matiere }}</p>
         <span class="font-bold
             @if($note->note >= 14) text-green-600
             @elseif($note->note >= 10) text-orange-500

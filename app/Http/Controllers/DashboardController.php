@@ -27,24 +27,21 @@ class DashboardController extends Controller
     public function apprenant()
     {
         $user = auth()->user();
-        $formation = $user->formation ? $user->formation->load([
-            'chapitres.souschapitres.quiz'
-        ]) : null;
+        $formations = Formation::withCount('chapitres')->latest()->get();
 
         $notes = $user->notes()->latest()->take(5)->get();
         $moyenneNotes = $user->notes()->avg('note');
 
-        // Dernier sous-chapitre consulté
+        // Premier sous-chapitre disponible pour "Reprendre"
         $dernierSousChapitre = null;
-        if ($formation) {
-            foreach ($formation->chapitres as $chapitre) {
-                foreach ($chapitre->souschapitres as $sc) {
-                    $dernierSousChapitre = $sc;
-                    break 2;
-                }
+        $premiereFormation = $formations->first();
+        if ($premiereFormation) {
+            $premierChapitre = $premiereFormation->chapitres()->orderBy('ordre')->first();
+            if ($premierChapitre) {
+                $dernierSousChapitre = $premierChapitre->souschapitres()->orderBy('ordre')->first();
             }
         }
 
-        return view('apprenants.dashboard', compact('user', 'formation', 'notes', 'moyenneNotes', 'dernierSousChapitre'));
+        return view('apprenants.dashboard', compact('user', 'formations', 'notes', 'moyenneNotes', 'dernierSousChapitre'));
     }
 }
