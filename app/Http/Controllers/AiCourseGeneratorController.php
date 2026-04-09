@@ -37,7 +37,7 @@ class AiCourseGeneratorController extends Controller
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
         ])->timeout(120)->post('https://api.groq.com/openai/v1/chat/completions', [
-            'model' => 'llama3-70b-8192',
+            'model' => 'llama-3.3-70b-versatile',
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $request->prompt],
