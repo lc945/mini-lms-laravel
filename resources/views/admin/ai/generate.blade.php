@@ -5,8 +5,8 @@
 <div class="max-w-2xl mx-auto">
     <div class="mb-6">
         <a href="{{ route('admin.formations.index') }}" class="text-blue-600 hover:text-blue-800 text-sm">← Retour aux formations</a>
-        <h1 class="text-2xl font-bold text-gray-800 mt-2">🤖 Générer un cours complet avec l'IA</h1>
-        <p class="text-gray-500 mt-1">Décrivez le cours souhaité en une phrase. L'IA génère automatiquement la formation, les chapitres, les contenus et les quiz.</p>
+        <h1 class="text-2xl font-bold text-gray-800 mt-2">🤖 Générer un cours avec l'IA</h1>
+        <p class="text-gray-500 mt-1">Décrivez librement le cours souhaité. L'IA génère automatiquement la formation complète, les chapitres, les contenus et les quiz.</p>
     </div>
 
     @if(session('error'))
@@ -16,32 +16,16 @@
     <form method="POST" action="{{ route('admin.ai.generate') }}" class="bg-white rounded-lg shadow p-6" id="form-generate">
         @csrf
 
-        <div class="mb-5">
+        <div class="mb-6">
             <label class="block text-gray-700 font-semibold mb-2">Votre consigne *</label>
-            <p class="text-xs text-gray-400 mb-2">Exemple : "Crée un cours sur le marketing au XXe siècle" ou "Explique la photosynthèse pour des lycéens"</p>
-            <textarea name="prompt" rows="4" required
-                      class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-purple-500 text-gray-700"
+            <p class="text-xs text-gray-400 mb-3">Exemples :<br>
+                "Explique le marketing au XXe siècle en 3 chapitres avec un quiz pour débutants."<br>
+                "Crée un cours sur la photosynthèse en 2 chapitres pour lycéens."
+            </p>
+            <textarea name="prompt" rows="5" required
+                      class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-purple-500 text-gray-700 text-base"
                       placeholder="Décrivez le cours que vous souhaitez générer...">{{ old('prompt') }}</textarea>
             @error('prompt') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div>
-                <label class="block text-gray-700 font-semibold mb-2">Nombre de chapitres *</label>
-                <select name="nb_chapitres" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
-                    @foreach([1,2,3] as $n)
-                        <option value="{{ $n }}" @selected(old('nb_chapitres', 2) == $n)>{{ $n }} chapitre{{ $n > 1 ? 's' : '' }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="block text-gray-700 font-semibold mb-2">Niveau *</label>
-                <select name="niveau" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
-                    @foreach(['Débutant','Intermédiaire','Avancé'] as $n)
-                        <option value="{{ $n }}" @selected(old('niveau', 'Débutant') == $n)>{{ $n }}</option>
-                    @endforeach
-                </select>
-            </div>
         </div>
 
         <button type="submit" id="btn-submit"
@@ -55,7 +39,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                 </svg>
-                <span class="text-purple-700 font-medium">L'IA génère votre cours complet... (30-60 secondes)</span>
+                <span class="text-purple-700 font-medium">L'IA génère votre cours... (30-60 secondes)</span>
             </div>
         </div>
     </form>
@@ -63,10 +47,9 @@
     <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
         <p class="font-semibold mb-1">💡 Ce qui sera généré automatiquement :</p>
         <ul class="list-disc list-inside space-y-1 text-blue-600">
-            <li>La formation avec titre et description</li>
-            <li>Les chapitres avec leur contenu pédagogique</li>
-            <li>2 sous-chapitres par chapitre</li>
-            <li>1 quiz de 3 questions par chapitre</li>
+            <li>La formation avec titre, description et niveau</li>
+            <li>Les chapitres avec contenus pédagogiques</li>
+            <li>Un quiz avec questions/réponses par chapitre</li>
         </ul>
     </div>
 </div>

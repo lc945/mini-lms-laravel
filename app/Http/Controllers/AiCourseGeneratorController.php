@@ -22,8 +22,6 @@ class AiCourseGeneratorController extends Controller
     {
         $request->validate([
             'prompt' => 'required|string|max:1000',
-            'nb_chapitres' => 'required|integer|min:1|max:10',
-            'niveau' => 'required|in:Débutant,Intermédiaire,Avancé',
         ]);
 
         $apiKey = config('services.groq.key');
@@ -31,7 +29,7 @@ class AiCourseGeneratorController extends Controller
             return back()->with('error', 'Clé API Groq non configurée.');
         }
 
-        $systemPrompt = 'JSON uniquement, sans markdown. Tout en français. Schéma : {"formation":{"nom":"","description":"","niveau":"' . $request->niveau . '","duree":3},"chapitres":[{"titre":"","description":"","sous_chapitres":[{"titre":"","contenu":"120 mots max, structuré avec exemples"}],"quiz":{"titre":"","questions":[{"question":"","reponses":["A","B","C"],"bonne_reponse":0}]}}]}. Génère ' . $request->nb_chapitres . ' chapitres, 1 sous-chapitre chacun, 2 questions de quiz.';
+        $systemPrompt = 'Tu es un expert en ingénierie pédagogique. Analyse la demande de l\'utilisateur et génère un cours complet en français. Retourne UNIQUEMENT un JSON valide sans markdown. Détermine toi-même le nombre de chapitres, le niveau (Débutant, Intermédiaire ou Avancé) et la durée selon la demande. Structure JSON : {"formation":{"nom":"","description":"","niveau":"Débutant|Intermédiaire|Avancé","duree":3},"chapitres":[{"titre":"","description":"","sous_chapitres":[{"titre":"","contenu":"contenu pédagogique de 100 mots avec exemples concrets"}],"quiz":{"titre":"","questions":[{"question":"","reponses":["A","B","C"],"bonne_reponse":0}]}}]}. Chaque chapitre : 1 sous-chapitre, 2 questions de quiz. Maximum 3 chapitres pour rester concis.';
 
         $payload = [
             'model' => 'llama-3.3-70b-versatile',
@@ -95,7 +93,6 @@ class AiCourseGeneratorController extends Controller
                 'ordre' => $ordre + 1,
             ]);
 
-            // Sous-chapitres
             foreach ($chapitreData['sous_chapitres'] as $scOrdre => $scData) {
                 $sousChapitre = SousChapitre::create([
                     'titre' => $scData['titre'],
